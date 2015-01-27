@@ -18,6 +18,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence( HttpServletRequest request, HttpServletResponse response,
                           AuthenticationException authException ) throws IOException {
 //        response.sendError( HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized!" );
-        response.sendRedirect("/login.html");
+//        response.sendRedirect("/login.html");
+        response.sendRedirect("/index.html");
     }
 }

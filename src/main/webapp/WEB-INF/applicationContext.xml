@@ -67,7 +67,7 @@
 		<security:logout
 				invalidate-session="true"
 				delete-cookies="JSESSIONID"
-				logout-success-url="/login.html"/>
+				logout-success-url="/index.html?logout=success"/>
 	</security:http>
 
 	<bean id="restAuthenticationEntryPoint"
@@ -76,7 +76,7 @@
 		  class="nl.rooftopenergy.bionic.security.SecurityUrlAuthenticationSuccessHandler"/>
 	<bean id="failureHandler"
 		  class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-		<constructor-arg value="/login.html?data=fail"/>
+		<constructor-arg value="/index.html?login=fail"/>
 	</bean>
 
 	<security:authentication-manager alias="authenticationManager">
