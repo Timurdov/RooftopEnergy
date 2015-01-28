@@ -11,9 +11,9 @@ USE `tomcat_ang` ;
 -- -----------------------------------------------------
 -- Table `tomcat_ang`.`Company`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tomcat_ang`.`Company` ;
+DROP TABLE IF EXISTS `tomcat_ang`.`company` ;
 
-CREATE TABLE IF NOT EXISTS `tomcat_ang`.`Company` (
+CREATE TABLE IF NOT EXISTS `tomcat_ang`.`company` (
   `CompanyID` INT(10) NOT NULL AUTO_INCREMENT,
   `CompanyName` VARCHAR(50) NULL DEFAULT NULL,
   `Country` VARCHAR(50) NULL DEFAULT NULL,
@@ -31,7 +31,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `tomcat_ang`.`User`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tomcat_ang`.`User` ;
+DROP TABLE IF EXISTS `tomcat_ang`.`user` ;
 
 CREATE TABLE IF NOT EXISTS `tomcat_ang`.`user` (
   `username` VARCHAR(50) NULL,
@@ -47,22 +47,32 @@ CREATE TABLE IF NOT EXISTS `tomcat_ang`.`user` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+-- -----------------------------------------------------
+-- Table `tomcat_ang`.`role`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tomcat_ang`.`role` ;
+
+CREATE TABLE IF NOT EXISTS `tomcat_ang`.`role` (
+  `roleId` INT(5) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`roleId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `tomcat_ang`.`user_roles`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tomcat_ang`.`user_roles` ;
 
-CREATE TABLE IF NOT EXISTS `tomcat_ang`.`User_roles` (
-  `user_role_id` INT(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `tomcat_ang`.`user_roles` (
   `username` VARCHAR(50) NOT NULL,
-  `role` VARCHAR(50) NOT NULL,
-  PRIMARY KEY (`user_role_id`),
-  UNIQUE KEY `uni_username_role` (`role`,`username`),
-  KEY `fk_username_idx` (`username`),
-  CONSTRAINT `fk_username` FOREIGN KEY (`username`) REFERENCES `tomcat_ang`.`user` (`username`))
+  `roleId` INT(5) NOT NULL,
+  UNIQUE KEY `uni_username_role` (`roleId`,`username`),
+  CONSTRAINT `fk_username` FOREIGN KEY (`username`) REFERENCES `tomcat_ang`.`user` (`username`),
+  CONSTRAINT `fk_roleId` FOREIGN KEY (`roleId`) REFERENCES `tomcat_ang`.`role` (`roleId`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+
 
 -- -----------------------------------------------------
 -- Table `tomcat_ang`.`RTFBox`
@@ -127,6 +137,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- ------------------------------------------------------
 -- Insert data
 -- ------------------------------------------------------
+DELETE FROM `role`;
 DELETE FROM `user_roles`;
 DELETE FROM `user`;
 DELETE FROM `RTFBoxData`;
@@ -151,15 +162,16 @@ INSERT INTO `user` VALUES
 ('abot','qwerty',true,'abot@email.ml',6),
 ('care','qwerty',true,'care@email.ml',7);
 
+INSERT INTO `role` VALUES (1, 'ROLE_USER');
 
-INSERT INTO `user_roles` (`username`, `role`) VALUES
-('rooftop', 'ROLE_USER'),
-('school', 'ROLE_USER'),
-('target', 'ROLE_USER'),
-('marat', 'ROLE_USER'),
-('cater', 'ROLE_USER'),
-('abot', 'ROLE_USER'),
-('care', 'ROLE_USER');
+INSERT INTO `user_roles` (`username`, `roleId`) VALUES
+('rooftop', 1),
+('school', 1),
+('target', 1),
+('marat', 1),
+('cater', 1),
+('abot', 1),
+('care', 1);
 
 INSERT INTO `RTFBox` VALUES
 (1,1,2,'The school panel'),
