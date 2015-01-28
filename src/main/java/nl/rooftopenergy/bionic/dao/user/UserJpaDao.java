@@ -2,11 +2,11 @@ package nl.rooftopenergy.bionic.dao.user;
 
 import nl.rooftopenergy.bionic.dao.JpaDao;
 import nl.rooftopenergy.bionic.entity.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -16,11 +16,21 @@ import java.util.List;
 
 
 @Repository
-public class UserJpaDao extends JpaDao<User,Integer> implements UserDao {
+public class UserJpaDao extends JpaDao<User,String> implements UserDao   {
 	
 
     public UserJpaDao() {
         super(User.class);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = this.findByName(username);
+        if (null == user) {
+            throw new UsernameNotFoundException("The user with name " + username + " was not found");
+        }
+
+        return user;
     }
 
     @Override

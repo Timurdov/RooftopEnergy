@@ -13,7 +13,7 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/tomcat" />
+		<property name="url" value="jdbc:mysql://localhost:3306/tomcat_ang" />
 		<property name="username" value="rooftop" />
 		<property name="password" value="energy" />
 	</bean>
@@ -35,12 +35,16 @@
 		</property>
 	</bean>
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" />
+	<!--<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" />-->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
 
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<bean
 		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+	<bean class="nl.rooftopenergy.bionic.dao.user.UserJpaDao" id="userJpaDao"/>
 
 	<!--
 		INIT REST COMPONENTS
@@ -52,7 +56,7 @@
 
 	<!-- Spring Security Settings-->
 
-	<security:http entry-point-ref="restAuthenticationEntryPoint">
+	<!--<security:http entry-point-ref="restAuthenticationEntryPoint">
 		<security:intercept-url pattern="/login.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<security:intercept-url pattern="/pages/home.html" access="ROLE_USER"/>
 		<security:intercept-url pattern="/rest/*" access="ROLE_USER"/>
@@ -62,31 +66,55 @@
 		<security:form-login
 				authentication-success-handler-ref="successHandler"
 				authentication-failure-handler-ref="failureHandler"/>
-		<security:remember-me
-				data-source-ref="dataSource"/>
+		&lt;!&ndash;<security:remember-me
+				data-source-ref="dataSource"/>&ndash;&gt;
 		<security:logout
 				invalidate-session="true"
 				delete-cookies="JSESSIONID"
 				logout-success-url="/index.html?logout=success"/>
+	</security:http>-->
+	<security:http
+			realm="Protected API"
+			use-expressions="true"
+			auto-config="false"
+			create-session="stateless"
+			entry-point-ref="restAuthenticationEntryPoint"
+			authentication-manager-ref="authenticationManager">
+		<security:custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+		<security:intercept-url pattern="/rest/user/authenticate" access="permitAll" />
+		<security:intercept-url method="GET" pattern="/rest/**" access="hasRole('user')" />
+		<security:intercept-url method="PUT" pattern="/rest/**" access="hasRole('user')" />
+		<security:intercept-url method="POST" pattern="/rest/**" access="hasRole('user')" />
+		<security:intercept-url method="DELETE" pattern="/rest/**" access="hasRole('user')" />
 	</security:http>
 
 	<bean id="restAuthenticationEntryPoint"
 		  class="nl.rooftopenergy.bionic.security.RestAuthenticationEntryPoint"/>
-	<bean id="successHandler"
+	<!--<bean id="successHandler"
 		  class="nl.rooftopenergy.bionic.security.SecurityUrlAuthenticationSuccessHandler"/>
 	<bean id="failureHandler"
 		  class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
 		<constructor-arg value="/index.html?login=fail"/>
-	</bean>
+	</bean>-->
 
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder">
+		<constructor-arg value="ThisIsASecretSoChangeMe" />
+	</bean>
 	<security:authentication-manager alias="authenticationManager">
-		<security:authentication-provider>
+		<security:authentication-provider user-service-ref="userJpaDao">
+			<security:password-encoder ref="passwordEncoder"></security:password-encoder>
+		</security:authentication-provider>
+		<!--<security:authentication-provider>
 			<security:jdbc-user-service data-source-ref="dataSource"
 										users-by-username-query=
 												"select username, password, enabled from users where username=?"
 										authorities-by-username-query=
 												"select username, role from user_roles where username =?  " />
-		</security:authentication-provider>
+		</security:authentication-provider>-->
 	</security:authentication-manager>
+
+	<bean class="nl.rooftopenergy.bionic.security.AuthenticationTokenProcessingFilter" id="authenticationTokenProcessingFilter">
+		<constructor-arg ref="userJpaDao" />
+	</bean>
 
 </beans>

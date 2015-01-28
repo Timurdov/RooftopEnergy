@@ -81,7 +81,7 @@
 										users-by-username-query=
 												"select username, password, enabled from users where username=?"
 										authorities-by-username-query=
-												"select username, role from user_roles where username =?  " />
+												"select username, role from Users_roles where username =?  " />
 		</security:authentication-provider>
 	</security:authentication-manager>
 

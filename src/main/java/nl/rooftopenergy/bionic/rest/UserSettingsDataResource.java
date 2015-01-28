@@ -3,11 +3,9 @@ package nl.rooftopenergy.bionic.rest;
 import nl.rooftopenergy.bionic.dao.company.CompanyDao;
 import nl.rooftopenergy.bionic.dao.rtfbox.RtfBoxDao;
 import nl.rooftopenergy.bionic.dao.user.UserDao;
-import nl.rooftopenergy.bionic.dao.users.UsersDao;
 import nl.rooftopenergy.bionic.entity.Company;
 import nl.rooftopenergy.bionic.entity.RtfBox;
 import nl.rooftopenergy.bionic.entity.User;
-import nl.rooftopenergy.bionic.entity.Users;
 import nl.rooftopenergy.bionic.rest.util.PrincipalInformation;
 import nl.rooftopenergy.bionic.transfer.PasswordTransfer;
 import nl.rooftopenergy.bionic.transfer.UserDataTransfer;
@@ -30,9 +28,6 @@ public class UserSettingsDataResource {
 
     @Inject
     private CompanyDao companyDao;
-
-    @Inject
-    private UsersDao usersDao;
 
     @Inject
     private RtfBoxDao rtfBoxDao;
@@ -125,10 +120,10 @@ public class UserSettingsDataResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response changePassword(PasswordTransfer passwordTransfer) {
 
-        Users currentUser = usersDao.find(principalInformation.getPrincipalName());
+        User currentUser = userDao.find(principalInformation.getPrincipalName());
         if (passwordTransfer.getOldPassword().equals(currentUser.getPassword())) {
             currentUser.setPassword(passwordTransfer.getNewPassword());
-            usersDao.save(currentUser);
+            userDao.save(currentUser);
         } else {
             return Response.notModified().build();
         }

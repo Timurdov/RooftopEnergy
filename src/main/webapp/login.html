@@ -6,23 +6,24 @@
 
     <h1>Login</h1>
 
-    <form class="form" method="post" action="/j_spring_security_check" autocomplete="off" id="logForm">
+    <!--<form class="form" method="post" action="/j_spring_security_check" autocomplete="off" id="logForm">-->
+    <form class="form" id="logForm">
 
 
       <p class="field">
-        <input type="text"  id="login1" name="j_username" maxlength="25" placeholder="Username" autofocus="" required/>
+        <input type="text"  id="login1"  ng-model="username" maxlength="25" placeholder="Username" autofocus="" required/>
         <i class="fa fa-user"></i>
       </p>
 
       <p class="field">
-        <input type="password" id="password1" name="j_password" maxlength="25" placeholder="Password" required/>
+        <input type="password" id="password1"  ng-model="password" maxlength="25" placeholder="Password" required/>
         <i class="fa fa-lock"></i>
       </p>
       <p class="remember" id="rem">
-        <input type="checkbox" id="remember"  name="_spring_security_remember_me"  value="yes" />
+        <input type="checkbox" id="remember"  ng-model="rememberMe"  value="yes" />
         <label id="lab" for="remember"><span></span>Remember Me</label>
       </p>
-      <p class="submit"><button type="submit" name="commit" value="Login"><i class="fa fa-check"></i></button></p>
+      <p class="submit"><button type="submit"  value="Login" ng-click="login()"><i class="fa fa-check"></i></button></p>
     </form>
   </div>
 

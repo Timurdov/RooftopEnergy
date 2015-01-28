@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "Company")
-public class /**/Company {
+public class Company {
     private Integer companyId;
     private String companyName;
     private String country;
