@@ -5,42 +5,24 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by UFO on 17.11.2014.
  */
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 public class User implements UserDetails{
+
+    private String username;
+    private String password;
+    private Boolean enabled;
+    private String email;
+    private Company company;
+    private List<Role> roles;
 
     @Id
     @Column(name = "username")
-    private String username;
-
-    @Basic
-    @Column(name = "password")
-    private String password;
-
-    @Basic
-    @Column(name = "enabled")
-    private Boolean enabled;
-
-    @Basic
-    @Column(name = "Email")
-    private String email;
-
-    @OneToOne
-    @JoinColumn(name = "CompanyID")
-    private Company company;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> roles = new HashSet<String>();
-
-
     public String getUsername() {
         return username;
     }
@@ -48,6 +30,9 @@ public class User implements UserDetails{
     public void setUsername(String username) {
         this.username = username;
     }
+
+    @Basic
+    @Column(name = "password")
     public String getPassword() {
         return password;
     }
@@ -56,7 +41,10 @@ public class User implements UserDetails{
         this.password = password;
     }
 
-    public Boolean getEnabled() {
+    @Basic
+    @Column(name = "enabled")
+    @Override
+    public boolean isEnabled() {
         return enabled;
     }
 
@@ -64,6 +52,8 @@ public class User implements UserDetails{
         this.enabled = enabled;
     }
 
+    @Basic
+    @Column(name = "Email")
     public String getEmail() {
         return email;
     }
@@ -72,7 +62,8 @@ public class User implements UserDetails{
         this.email = email;
     }
 
-
+    @OneToOne
+    @JoinColumn(name = "CompanyID")
     public Company getCompany() {
         return company;
     }
@@ -80,56 +71,55 @@ public class User implements UserDetails{
     public void setCompany(Company company) {
         this.company = company;
     }
-    public Set<String> getRoles()
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns = {@JoinColumn(name="username", referencedColumnName = "username")},
+                inverseJoinColumns = {@JoinColumn(name="roleId",referencedColumnName = "roleId")})
+    public List<Role> getRoles()
     {
         return this.roles;
     }
 
-
-    public void setRoles(Set<String> roles)
+    public void setRoles(List<Role> roles)
     {
         this.roles = roles;
     }
 
-
-    public void addRole(String role) {
+    public void addRole(Role role) {
         this.roles.add(role);
     }
 
     @Override
+    @Transient
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<String> roles = this.getRoles();
-
+        List<Role> roles = this.getRoles();
         if (roles == null) {
             return Collections.emptyList();
         }
-
-        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        for (String role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role));
+        Set<SimpleGrantedAuthority> authorities = new HashSet<SimpleGrantedAuthority>();
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
 
         return authorities;
     }
 
     @Override
+    @Transient
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
+    @Transient
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
+    @Transient
     public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 
     @Override
@@ -147,7 +137,6 @@ public class User implements UserDetails{
 
     @Override
     public int hashCode() {
-
         int result = username != null ? username.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (company != null ? company.hashCode() : 0);
