@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS `tomcat_ang`.`user` ;
 
 CREATE TABLE IF NOT EXISTS `tomcat_ang`.`user` (
   `username` VARCHAR(50) NULL,
-  `password` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(64) NOT NULL,
   `enabled` TINYINT(1) NOT NULL DEFAULT 1,
   `Email` VARCHAR(50) NULL DEFAULT NULL,
   `CompanyID` INT(10) NOT NULL,
@@ -154,13 +154,13 @@ INSERT INTO `Company` VALUES
 (7, 'Caremark', 'Netherland', 'Groningen', 'Groningen', 'Elleboog', 12345,'Some description', 1);
 
 INSERT INTO `user` VALUES
-('rooftop','energy',true,'email@email.ml',1),
-('school','student',true,'school@email.ml',2),
-('target','qwerty',true,'target@email.ml',3),
-('marat','qwerty',true,'marat@email.ml',4),
-('cater','qwerty',true,'cater@email.ml',5),
-('abot','qwerty',true,'abot@email.ml',6),
-('care','qwerty',true,'care@email.ml',7);
+('rooftop','$2a$10$q9X.5QjaJijlPp98/ZFcTulJdkwqxChRhTdxX9QeWdmF6RJJI4dUu',true,'email@email.ml',1),
+('school','$2a$10$9OCJAyKVUH28xrACBGYrlOv5BqqHUSHdGdaAGdtEVuZCn7KPlUlsW',true,'school@email.ml',2),
+('target','$2a$10$YF.GdX55AHRYJxDVLXwj1uT/Cpye5UOjyvMcOV7n8M4uvIaErqEpq',true,'target@email.ml',3),
+('marat','$2a$10$rpRS6nT9eUDhG2F91vLumOwxwPEeQw5ITXKVt8l0ks5U47KMwuTpi',true,'marat@email.ml',4),
+('cater','$2a$10$3ZspyhdXURgWDu8iwOe82uwSNEI1vW0ZIE.3XPg67AZvc1Tt6gxXm',true,'cater@email.ml',5),
+('abot','$2a$10$wzMvqA92Bru4C6iencWseuypyyocFfV5RMRGw7qX4RwsrTF8hi/t2',true,'abot@email.ml',6),
+('care','$2a$10$deeJBMv8VH/KT5BK3Mj0pOHV56CViP6jf9XEDBYI8xk/JHpvf0kbq',true,'care@email.ml',7);
 
 INSERT INTO `role` VALUES (1, 'ROLE_USER');
 
