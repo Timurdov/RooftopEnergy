@@ -1,3 +1,9 @@
+var generalAppConfig = {
+    /* When set to false a query parameter is used to pass on the auth token.
+     * This might be desirable if headers don't work correctly in some
+     * environments and is still secure when using https. */
+    useAuthTokenHeader: true
+};
 var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.services']).config(
         [ '$routeProvider', '$locationProvider', '$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
 
@@ -7,7 +13,7 @@ var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.serv
                 controller: LoginController
             });
 
-            //$locationProvider.hashPrefix('!');
+            $locationProvider.hashPrefix('!');
 
             /* Register error provider that shows message on failed requests or redirects to login page on
              * unauthenticated requests */
@@ -18,9 +24,9 @@ var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.serv
                             var config = rejection.config;
                             var method = config.method;
                             var url = config.url;
-
                             if (status == 401) {
                                 $location.path( "/login" );
+                                $rootScope.loginFail(true);
                             } else {
                                 $rootScope.error = method + " on " + url + " failed with status " + status;
                             }
@@ -39,7 +45,7 @@ var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.serv
                             var isRestCall = config.url.indexOf('rest') == 0;
                             if (isRestCall && angular.isDefined($rootScope.authToken)) {
                                 var authToken = $rootScope.authToken;
-                                if (exampleAppConfig.useAuthTokenHeader) {
+                                if (generalAppConfig.useAuthTokenHeader) {
                                     config.headers['X-Auth-Token'] = authToken;
                                 } else {
                                     config.url = config.url + "?token=" + authToken;
@@ -97,7 +103,12 @@ var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.serv
 
 function LoginController($scope, $rootScope, $location, $cookieStore, UserService) {
 
-    $scope.rememberMe = false;
+    //$scope.rememberMe = false;
+
+    $rootScope.loginFail = function(showAlert){
+        $scope.loginAlert = showAlert;
+    };
+    $rootScope.loginFail(false);
 
     $scope.login = function() {
         UserService.authenticate($.param({username: $scope.username, password: $scope.password}), function(authenticationResult) {
@@ -108,6 +119,7 @@ function LoginController($scope, $rootScope, $location, $cookieStore, UserServic
             }
             UserService.get(function(user) {
                 $rootScope.user = user;
+                console.log(user);
                 $location.path("/");
             });
         });
@@ -127,6 +139,7 @@ services.factory('UserService', function($resource) {
         }
     );
 });
+
 
     /*app.directive("login", function(){
         return{

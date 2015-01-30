@@ -14,9 +14,11 @@ import javax.ws.rs.core.MediaType;
 import nl.rooftopenergy.bionic.security.TokenUtils;
 import nl.rooftopenergy.bionic.transfer.TokenTransfer;
 import nl.rooftopenergy.bionic.transfer.UserTransfer;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Path("/user")
 public class UserResource
 {
-
+	private static final Logger logger = Logger.getLogger(UserResource.class);
 	@Autowired
 	private UserDetailsService userService;
 
@@ -73,18 +75,23 @@ public class UserResource
 	@Produces(MediaType.APPLICATION_JSON)
 	public TokenTransfer authenticate(@FormParam("username") String username, @FormParam("password") String password)
 	{
-		UsernamePasswordAuthenticationToken authenticationToken =
-				new UsernamePasswordAuthenticationToken(username, password);
-		Authentication authentication = this.authManager.authenticate(authenticationToken);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		try {
+			UsernamePasswordAuthenticationToken authenticationToken =
+					new UsernamePasswordAuthenticationToken(username, password);
+			Authentication authentication = this.authManager.authenticate(authenticationToken);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		/*
 		 * Reload user as password of authentication principal will be null after authorization and
 		 * password is needed for token generation
 		 */
-		UserDetails userDetails = this.userService.loadUserByUsername(username);
+			UserDetails userDetails = this.userService.loadUserByUsername(username);
 
-		return new TokenTransfer(TokenUtils.createToken(userDetails));
+			return new TokenTransfer(TokenUtils.createToken(userDetails));
+		} catch (BadCredentialsException e){
+			logger.error(e.getMessage());
+			throw new WebApplicationException(401);
+		}
 	}
 
 
