@@ -44,7 +44,7 @@
 
 	<bean
 		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
-	<bean class="nl.rooftopenergy.bionic.dao.user.UserJpaDao" id="userJpaDao"/>
+	<!--<bean class="nl.rooftopenergy.bionic.dao.user.UserJpaDao" id="userJpaDao"/>-->
 
 	<!--
 		INIT REST COMPONENTS

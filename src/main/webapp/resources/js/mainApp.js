@@ -4,6 +4,8 @@ var generalAppConfig = {
      * environments and is still secure when using https. */
     useAuthTokenHeader: true
 };
+
+
 var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.services']).config(
         [ '$routeProvider', '$locationProvider', '$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
 
@@ -11,6 +13,11 @@ var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.serv
             $routeProvider.when('/login', {
                 templateUrl: 'login.html',
                 controller: LoginController
+            });
+
+            $routeProvider.otherwise({
+                templateUrl: 'pages/home.html',
+                controller: HomeController
             });
 
             $locationProvider.hashPrefix('!');
@@ -99,11 +106,35 @@ var app = angular.module("generalApp", ['ngRoute', 'ngCookies', 'generalApp.serv
             }
 
             $rootScope.initialized = true;
+
+            $rootScope.styleSheet = {
+                login_styleCSS : true,
+                homeCSS : true,
+                productionCSS : true,
+                consumptionCSS : true,
+                changePasswordCSS : true,
+                pagesCSS : true,
+                ecoDataCSS : true,
+                scoreCSS : true,
+                comparingCSS : true,
+                weatherCSS : true,
+                settingsCSS : true
+            };
+
+            $rootScope.switchOffCSS = function(){
+                for(var index in $rootScope.styleSheet){
+                    if ($rootScope.styleSheet.hasOwnProperty(index)) {
+                        $rootScope.styleSheet[index] = true;
+                    }
+                }
+            };
         });
 
 function LoginController($scope, $rootScope, $location, $cookieStore, UserService) {
 
     //$scope.rememberMe = false;
+    $rootScope.switchOffCSS();
+    $rootScope.styleSheet.login_styleCSS = false;
 
     $rootScope.loginFail = function(showAlert){
         $scope.loginAlert = showAlert;
@@ -123,8 +154,26 @@ function LoginController($scope, $rootScope, $location, $cookieStore, UserServic
                 $location.path("/");
             });
         });
+
     };
 };
+
+function HomeController($scope, $rootScope, $location, $cookieStore, UserSettingsDataService){
+
+    $rootScope.switchOffCSS();
+    $rootScope.styleSheet.productionCSS = false;
+    $rootScope.styleSheet.pagesCSS = false;
+    $rootScope.styleSheet.ecoDataCSS = false;
+
+    UserSettingsDataService.getUserDescription(function(info){
+        $rootScope.userInfo = info;
+        console.log("GET user Data - " + info.userName + ", " + info.company);
+        $scope.greeting = "Hello " + info.userName + "!, from company: " + info.company;
+    })
+
+
+}
+
 var services = angular.module('generalApp.services', ['ngResource']);
 
 services.factory('UserService', function($resource) {
@@ -140,6 +189,24 @@ services.factory('UserService', function($resource) {
     );
 });
 
+services.factory('UserSettingsDataService', function($resource) {
+    return $resource('rest/boxData/:action', {},
+        {
+            saveNewUserInfo: {
+                method: 'POST',
+                params: {'action' : 'saveNewUserInfo'}
+            },
+            getUserDescription: {
+                method: 'GET',
+                params: {'action': 'getUserDescription'}
+            },
+            changePassword: {
+                method: 'POST',
+                params: {'action' : 'changePassword'}
+            }
+        }
+    )
+});
 
     /*app.directive("login", function(){
         return{
